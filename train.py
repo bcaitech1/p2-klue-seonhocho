@@ -1,19 +1,34 @@
 import pickle as pickle
 import os
+import random
 
+import numpy as np
 import pandas as pd
 import torch
 import wandb
 from sklearn.metrics import accuracy_score
 from transformers import (
     AutoTokenizer,
-    BertForSequenceClassification,
     Trainer,
     TrainingArguments,
-    BertConfig,
+    ElectraModel,
+    ElectraConfig,
+    ElectraTokenizer,
+    ElectraForSequenceClassification,
 )
 
 from load_data import *
+
+
+def seed_everything(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  # if use multi-GPU
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(seed)
+    random.seed(seed)
+
 
 # 평가를 위한 metrics function.
 def compute_metrics(pred):
@@ -28,7 +43,7 @@ def compute_metrics(pred):
 
 def train():
     # load model and tokenizer
-    MODEL_NAME = "bert-base-multilingual-cased"
+    MODEL_NAME = "monologg/koelectra-base-v3-discriminator"
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     # load dataset
@@ -48,10 +63,10 @@ def train():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # setting model hyperparameter
-    bert_config = BertConfig.from_pretrained(MODEL_NAME)
-    bert_config.num_labels = 42
-    model = BertForSequenceClassification.from_pretrained(
-        MODEL_NAME, config=bert_config
+    electra_config = ElectraConfig.from_pretrained(MODEL_NAME)
+    electra_config.num_labels = 42
+    model = ElectraForSequenceClassification.from_pretrained(
+        MODEL_NAME, config=electra_config
     )
     model.parameters
     model.to(device)
@@ -60,9 +75,9 @@ def train():
     # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments 참고해주세요.
     training_args = TrainingArguments(
         output_dir="./results",  # output directory
-        save_total_limit=3,  # number of total save model.
+        save_total_limit=5,  # number of total save model.
         save_steps=500,  # model saving step.
-        num_train_epochs=4,  # total number of training epochs
+        num_train_epochs=6,  # total number of training epochs
         learning_rate=5e-5,  # learning_rate
         per_device_train_batch_size=16,  # batch size per device during training
         # per_device_eval_batch_size=16,   # batch size for evaluation
@@ -89,6 +104,7 @@ def train():
 
 
 def main():
+    seed_everything(42)
     train()
 
 
