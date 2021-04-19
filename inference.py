@@ -16,7 +16,7 @@ import argparse
 
 
 def inference(model, tokenized_sent, device):
-    dataloader = DataLoader(tokenized_sent, batch_size=40, shuffle=False)
+    dataloader = DataLoader(tokenized_sent, batch_size=40, shuffle=False, num_workers=4)
     model.eval()
     output_pred = []
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # model dir
-    parser.add_argument("--model_dir", type=str, default="./results/checkpoint-3000")
+    parser.add_argument("--model_dir", type=str, default="./results/checkpoint-5500")
     args = parser.parse_args()
     print(args)
     main(args)

@@ -77,7 +77,8 @@ def train():
         output_dir="./results",  # output directory
         save_total_limit=5,  # number of total save model.
         save_steps=500,  # model saving step.
-        num_train_epochs=6,  # total number of training epochs
+        num_train_epochs=10,  # total number of training epochs
+        dataloader_num_workers=4,
         learning_rate=5e-5,  # learning_rate
         per_device_train_batch_size=16,  # batch size per device during training
         # per_device_eval_batch_size=16,   # batch size for evaluation
@@ -90,6 +91,7 @@ def train():
         # `steps`: Evaluate every `eval_steps`.
         # `epoch`: Evaluate every end of epoch.
         # eval_steps = 500,            # evaluation step.
+        label_smoothing_factor=0.3,
     )
     trainer = Trainer(
         model=model,  # the instantiated 🤗 Transformers model to be trained
