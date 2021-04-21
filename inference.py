@@ -1,10 +1,10 @@
 from transformers import (
     AutoTokenizer,
-    ElectraForSequenceClassification,
+    RobertaForSequenceClassification,
+    RobertaConfig,
+    RobertaTokenizer,
     Trainer,
     TrainingArguments,
-    ElectraConfig,
-    ElectraTokenizer,
 )
 from torch.utils.data import DataLoader
 from load_data import *
@@ -16,7 +16,7 @@ import argparse
 
 
 def inference(model, tokenized_sent, device):
-    dataloader = DataLoader(tokenized_sent, batch_size=40, shuffle=False, num_workers=4)
+    dataloader = DataLoader(tokenized_sent, batch_size=40, shuffle=False)
     model.eval()
     output_pred = []
 
@@ -25,7 +25,8 @@ def inference(model, tokenized_sent, device):
             outputs = model(
                 input_ids=data["input_ids"].to(device),
                 attention_mask=data["attention_mask"].to(device),
-                token_type_ids=data["token_type_ids"].to(device),
+                # RoBERTa doesn't use token type ids
+                # token_type_ids=data["token_type_ids"].to(device),
             )
         logits = outputs[0]
         logits = logits.detach().cpu().numpy()
@@ -50,12 +51,15 @@ def main(args):
   """
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # load tokenizer
-    TOK_NAME = "monologg/koelectra-base-v3-discriminator"
+    TOK_NAME = "xlm-roberta-large"
     tokenizer = AutoTokenizer.from_pretrained(TOK_NAME)
+    added_tokens_num = tokenizer.add_special_tokens(
+        {"additional_special_tokens": ["[e1]", "[/e1]", "[e2]", "[/e2]"]}
+    )
 
     # load my model
     MODEL_NAME = args.model_dir  # model dir.
-    model = ElectraForSequenceClassification.from_pretrained(args.model_dir)
+    model = RobertaForSequenceClassification.from_pretrained(args.model_dir)
     model.parameters
     model.to(device)
 
@@ -77,7 +81,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # model dir
-    parser.add_argument("--model_dir", type=str, default="./results/checkpoint-5500")
+    parser.add_argument("--model_dir", type=str, default="./results/checkpoint-3500")
     args = parser.parse_args()
     print(args)
     main(args)
