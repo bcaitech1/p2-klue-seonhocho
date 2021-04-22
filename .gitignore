@@ -4,3 +4,4 @@ wandb
 prediction
 .ipynb_checkpoints
 __pycache__
+*.tsv

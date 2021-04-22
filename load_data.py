@@ -22,14 +22,6 @@ class RE_Dataset(torch.utils.data.Dataset):
         return len(self.labels)
 
 
-def add_entity(s: str, s1: int, d1: int, s2: int, d2: int) -> str:
-    return (
-        f"{s[:s1]}[e1]{s[s1:d1+1]}[/e1]{s[d1+1:s2]}[e2]{s[s2:d2+1]}[/e2]{s[d2+1:]}"
-        if s1 < s2
-        else f"{s[:s2]}[e2]{s[s2:d2+1]}[/e2]{s[d2+1:s1]}[e1]{s[s1:d1+1]}[/e1]{s[d1+1:]}"
-    )
-
-
 # 처음 불러온 tsv 파일을 원하는 형태의 DataFrame으로 변경 시켜줍니다.
 # 변경한 DataFrame 형태는 baseline code description 이미지를 참고해주세요.
 def preprocessing_dataset(dataset, label_type):
@@ -42,12 +34,9 @@ def preprocessing_dataset(dataset, label_type):
             label.append(label_type[i])
         idx += 1
 
-    sentences = dataset.apply(
-        lambda x: add_entity(x[1], x[3], x[4], x[6], x[7]), axis=1
-    )
     out_dataset = pd.DataFrame(
         {
-            "sentence": sentences,
+            "sentence": dataset[1],
             "entity_01": dataset[2],
             "entity_02": dataset[5],
             "label": label,

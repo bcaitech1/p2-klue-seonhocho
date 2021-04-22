@@ -53,9 +53,9 @@ def main(args):
     # load tokenizer
     TOK_NAME = "xlm-roberta-large"
     tokenizer = AutoTokenizer.from_pretrained(TOK_NAME)
-    added_tokens_num = tokenizer.add_special_tokens(
-        {"additional_special_tokens": ["[e1]", "[/e1]", "[e2]", "[/e2]"]}
-    )
+    # added_tokens_num = tokenizer.add_special_tokens(
+    #     {"additional_special_tokens": ["[e1]", "[/e1]", "[e2]", "[/e2]"]}
+    # )
 
     # load my model
     MODEL_NAME = args.model_dir  # model dir.
@@ -64,7 +64,8 @@ def main(args):
     model.to(device)
 
     # load test datset
-    test_dataset_dir = "/opt/ml/input/data/test/test.tsv"
+    # test_dataset_dir = "/opt/ml/input/data/test/test.tsv"
+    test_dataset_dir = "test-with-marker.tsv"
     test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
     test_dataset = RE_Dataset(test_dataset, test_label)
 
@@ -81,7 +82,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # model dir
-    parser.add_argument("--model_dir", type=str, default="./results/checkpoint-3500")
+    parser.add_argument("--model_dir", type=str, default="./results/checkpoint-1000")
     args = parser.parse_args()
     print(args)
     main(args)
