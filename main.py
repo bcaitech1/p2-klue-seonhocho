@@ -12,8 +12,8 @@ if __name__ == "__main__":
     os.environ["WANDB_PROJECT"] = "P2_KLUE"
     os.environ["WANDB_LOG_MODEL"] = "true"
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    # seed = 42
-    # seed_everything(seed)
+    seed = 17
+    seed_everything(seed)
     model = train()
 
     TOK_NAME = "xlm-roberta-large"

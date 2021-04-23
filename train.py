@@ -120,7 +120,7 @@ def train():
 def main():
     random_seed = 1231248
     seed_everything(random_seed)
-    train(random_seed)
+    train()
 
 
 if __name__ == "__main__":
